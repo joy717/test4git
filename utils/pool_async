@@ -77,7 +77,8 @@ func (a *PoolAsync) DoWitError(f func() error) *PoolAsync {
 		}()
 		err := f()
 		if err != nil {
-			fmt.Printf("PoolAsync.Do called function return error: %v", err)
+			// log error
+			//fmt.Printf("PoolAsync.Do called function return error: %v\n", err)
 		}
 		a.errList[currentIdx] = err
 	}()
