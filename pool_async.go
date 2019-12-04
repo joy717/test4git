@@ -19,6 +19,8 @@ type PoolAsync struct {
 	// job error list. the cursor is the index of jobs.
 	// if job doesn't have error, then the element is nil
 	errList []error
+
+	errChan chan error
 }
 
 func NewPoolAsync(count int) *PoolAsync {
@@ -65,6 +67,7 @@ func (a *PoolAsync) DoWitError(f func() error) *PoolAsync {
 	currentIdx := atomic.AddInt32(&a.jobSize, 1) - 1
 	// add a new element for later use
 	a.errList = append(a.errList, nil)
+	errChan := make(chan error)
 	go func() {
 		defer func() {
 			a.poolChan <- ticket            //release pool ticket
@@ -72,7 +75,8 @@ func (a *PoolAsync) DoWitError(f func() error) *PoolAsync {
 			atomic.AddInt32(&a.jobSize, -1) // decrease job size
 			if err := recover(); err != nil {
 				debug.PrintStack()
-				a.errList[currentIdx] = fmt.Errorf("PoolAsync.DoWitError %v panic: %v", currentIdx, err)
+				errChan <- fmt.Errorf("PoolAsync.DoWitError %v panic: %v", currentIdx, err)
+				//a.errList[currentIdx] = fmt.Errorf("PoolAsync.DoWitError %v panic: %v", currentIdx, err)
 			}
 		}()
 		err := f()
@@ -80,8 +84,13 @@ func (a *PoolAsync) DoWitError(f func() error) *PoolAsync {
 			// log error
 			//fmt.Printf("PoolAsync.Do called function return error: %v\n", err)
 		}
-		a.errList[currentIdx] = err
+		errChan <- err
+		//a.errList[currentIdx] = err
 	}()
+
+	err := <-errChan
+	a.errList[currentIdx] = err
+
 	return a
 }
 
