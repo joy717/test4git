@@ -19,8 +19,6 @@ type PoolAsync struct {
 	// job error list. the cursor is the index of jobs.
 	// if job doesn't have error, then the element is nil
 	errList []error
-
-	errChan chan error
 }
 
 func NewPoolAsync(count int) *PoolAsync {
