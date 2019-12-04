@@ -50,8 +50,8 @@ func (a *PoolAsync) Do(f func()) *PoolAsync {
 	atomic.AddInt32(&a.jobSize, 1)
 	go func() {
 		defer func() {
-			a.poolChan <- ticket //release pool ticket
-			a.jobChan <- ticket // done job.
+			a.poolChan <- ticket            //release pool ticket
+			a.jobChan <- ticket             // done job.
 			atomic.AddInt32(&a.jobSize, -1) // decrease job size
 		}()
 		f()
@@ -67,8 +67,8 @@ func (a *PoolAsync) DoWitError(f func() error) *PoolAsync {
 	a.errList = append(a.errList, nil)
 	go func() {
 		defer func() {
-			a.poolChan <- ticket //release pool ticket
-			a.jobChan <- ticket // done job.
+			a.poolChan <- ticket            //release pool ticket
+			a.jobChan <- ticket             // done job.
 			atomic.AddInt32(&a.jobSize, -1) // decrease job size
 			if err := recover(); err != nil {
 				debug.PrintStack()
