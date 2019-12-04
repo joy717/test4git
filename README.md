@@ -5,10 +5,10 @@ pool-async is a tool for goroutines with a pool.
 ```
 package main
 
-import "github.com/joy717/pool-async/utils"
+import "github.com/joy717/poolasync"
 
 func main() {
-  pa := utils.NewDefaultPoolAsync()
+  pa := poolasync.NewDefaultPoolAsync()
   pa.DoWitError(func() error {
     fmt.Println("goroutine 1")
     return nil
