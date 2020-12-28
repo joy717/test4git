@@ -6,6 +6,7 @@ pool-async is a tool for goroutines with a pool.
 package main
 
 import "github.com/joy717/poolasync"
+import "fmt"
 
 func main() {
   pa := poolasync.NewDefaultPoolAsync()
@@ -17,8 +18,10 @@ func main() {
     return fmt.Errorf("goroutine 2 err")
   })
   
+  // NOTICE: should call pa.Wait() always to complete the jobs.
+  // because we use channel, Wait() is the reciver function.
   if err := pa.Wait(); err != nil {
-    t.Println("the 1st non-nil err: ", err)
+    fmt.Println("the 1st non-nil err: ", err)
   }
 }
 ```
